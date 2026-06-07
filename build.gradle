@@ -19,6 +19,11 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
 
+    // Modify version for snapshots if snapshotSuffix is provided
+    if (project.hasProperty("snapshotSuffix")) {
+        version = version + "-" + project.property("snapshotSuffix")
+    }
+
     java {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -51,13 +56,13 @@ subprojects {
     }
 
     // Task to create sources jar
-    task sourcesJar(type: Jar) {
+    tasks.register('sourcesJar', Jar) {
         archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
 
     // Task to create javadoc jar
-    task javadocJar(type: Jar) {
+    tasks.register('javadocJar', Jar) {
         archiveClassifier = 'javadoc'
         from javadoc
     }
@@ -149,20 +154,20 @@ subprojects {
 }
 
 // Custom publish tasks
-task publishSnapshot {
+tasks.register('publishSnapshot') {
     doFirst {
         if (!project.hasProperty("snapshotSuffix")) {
             throw new GradleException("Please provide snapshotSuffix property. Usage: ./gradlew publishSnapshot -PsnapshotSuffix=<suffix>")
         }
     }
-    dependsOn 'publishMavenJavaPublicationToSnapshotsRepository'
+    dependsOn subprojects.collect { it.tasks.named('publishMavenJavaPublicationToSnapshotsRepository') }
     doLast {
         println "Published snapshot version for all subprojects"
     }
 }
 
-task publishRelease {
-    dependsOn 'publishMavenJavaPublicationToReleasesRepository'
+tasks.register('publishRelease') {
+    dependsOn subprojects.collect { it.tasks.named('publishMavenJavaPublicationToReleasesRepository') }
     doLast {
         println "Published release version for all subprojects"
     }
