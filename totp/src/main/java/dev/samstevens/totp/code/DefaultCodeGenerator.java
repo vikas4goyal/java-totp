@@ -55,12 +55,19 @@ public class DefaultCodeGenerator implements CodeGenerator {
 
         // Create a HMAC-SHA1 signing key from the shared key
         Base32 codec = new Base32();
+        // Validate key is a proper Base32 string before decoding
+        if (!codec.isInAlphabet(key.getBytes(java.nio.charset.StandardCharsets.US_ASCII), true)) {
+            throw new InvalidKeyException("Key is not a valid Base32-encoded string.");
+        }
         byte[] decodedKey = codec.decode(key);
+        if (decodedKey.length == 0) {
+            throw new InvalidKeyException("Decoded key is empty. Ensure the secret is a valid Base32-encoded string.");
+        }
         SecretKeySpec signKey = new SecretKeySpec(decodedKey, algorithm.getHmacAlgorithm());
         Mac mac = Mac.getInstance(algorithm.getHmacAlgorithm());
         mac.init(signKey);
 
-        // Create a hash of the counter value
+        // Create a hash of the counter-value
         return mac.doFinal(data);
     }
 
@@ -78,7 +85,7 @@ public class DefaultCodeGenerator implements CodeGenerator {
         }
 
         truncatedHash &= 0x7FFFFFFF;
-        truncatedHash %= Math.pow(10, digits);
+        truncatedHash %= (long) Math.pow(10, digits);
 
         // Left pad with 0s for a n-digit code
         return String.format("%0" + digits + "d", truncatedHash);

@@ -10,21 +10,19 @@ import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass(TotpInfo.class)
 @EnableConfigurationProperties(TotpProperties.class)
 public class TotpAutoConfiguration {
 
-    private TotpProperties props;
+    private final TotpProperties props;
 
-    @Autowired
     public TotpAutoConfiguration(TotpProperties props) {
         this.props = props;
     }

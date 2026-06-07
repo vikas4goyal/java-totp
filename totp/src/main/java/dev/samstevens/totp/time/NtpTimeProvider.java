@@ -54,7 +54,7 @@ public class NtpTimeProvider implements TimeProvider {
 
     private void checkHasDependency(String dependentClass) {
         try {
-            Class<?> ntpClientClass = Class.forName(dependentClass);
+            Class.forName(dependentClass);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("The Apache Commons Net library must be on the classpath to use the NtpTimeProvider.");
         }
