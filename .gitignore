@@ -9,3 +9,5 @@ target
 bin
 /.gradle/
 /build/
+/totp/build/
+/totp-spring-boot-starter/build/

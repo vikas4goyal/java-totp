@@ -19,16 +19,22 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
 
-    sourceCompatibility = '21'
-    targetCompatibility = '21'
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
     repositories {
+//        maven {
+//            name = "releases"
+//            url = uri("http://vicky-nas.tail70d9.ts.net:8081/repository/maven-public/")
+//            allowInsecureProtocol = true
+//        }
         maven {
             name = "releases"
-            url = uri("http://vicky-nas.tail70d9.ts.net:8081/repository/maven-public/")
+            url = uri("http://192.168.0.52:8081/repository/maven-public/")
             allowInsecureProtocol = true
         }
-        mavenCentral()
     }
 
     tasks.withType(JavaCompile) {
@@ -59,18 +65,36 @@ subprojects {
     // Publishing configuration
     publishing {
         repositories {
+//            maven {
+//                name = 'snapshots'
+//                url = uri('http://vicky-nas.tail70d9.ts.net:8081/repository/maven-snapshots/')
+//                allowInsecureProtocol = true
+//                credentials {
+//                    username = System.getenv('MAVEN_USERNAME') ?: ''
+//                    password = System.getenv('MAVEN_PASSWORD') ?: ''
+//                }
+//            }
             maven {
                 name = 'snapshots'
-                url = uri('http://vicky-nas.tail70d9.ts.net:8081/repository/maven-snapshots/')
+                url = uri('http://192.168.0.52:8081/repository/maven-snapshots/')
                 allowInsecureProtocol = true
                 credentials {
                     username = System.getenv('MAVEN_USERNAME') ?: ''
                     password = System.getenv('MAVEN_PASSWORD') ?: ''
                 }
             }
+//            maven {
+//                name = 'releases'
+//                url = uri('http://vicky-nas.tail70d9.ts.net:8081/repository/maven-releases/')
+//                allowInsecureProtocol = true
+//                credentials {
+//                    username = System.getenv('MAVEN_USERNAME') ?: ''
+//                    password = System.getenv('MAVEN_PASSWORD') ?: ''
+//                }
+//            }
             maven {
                 name = 'releases'
-                url = uri('http://vicky-nas.tail70d9.ts.net:8081/repository/maven-releases/')
+                url = uri('http://192.168.0.52:8081/repository/maven-releases/')
                 allowInsecureProtocol = true
                 credentials {
                     username = System.getenv('MAVEN_USERNAME') ?: ''
