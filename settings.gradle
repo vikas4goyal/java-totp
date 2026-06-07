@@ -1,0 +1,5 @@
+rootProject.name = 'java-totp'
+
+include 'totp'
+include 'totp-spring-boot-starter'
+

@@ -1,0 +1,151 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = property('GROUP').toString()
+version = property('VERSION_NAME').toString()
+
+allprojects {
+    group = rootProject.group
+    version = rootProject.version
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
+
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
+
+    repositories {
+        maven {
+            name = "releases"
+            url = uri("http://vicky-nas.tail70d9.ts.net:8081/repository/maven-public/")
+            allowInsecureProtocol = true
+        }
+        mavenCentral()
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    // JaCoCo test report configuration
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+            html.required = true
+        }
+    }
+
+    // Task to create sources jar
+    task sourcesJar(type: Jar) {
+        archiveClassifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    // Task to create javadoc jar
+    task javadocJar(type: Jar) {
+        archiveClassifier = 'javadoc'
+        from javadoc
+    }
+
+    // Publishing configuration
+    publishing {
+        repositories {
+            maven {
+                name = 'snapshots'
+                url = uri('http://vicky-nas.tail70d9.ts.net:8081/repository/maven-snapshots/')
+                allowInsecureProtocol = true
+                credentials {
+                    username = System.getenv('MAVEN_USERNAME') ?: ''
+                    password = System.getenv('MAVEN_PASSWORD') ?: ''
+                }
+            }
+            maven {
+                name = 'releases'
+                url = uri('http://vicky-nas.tail70d9.ts.net:8081/repository/maven-releases/')
+                allowInsecureProtocol = true
+                credentials {
+                    username = System.getenv('MAVEN_USERNAME') ?: ''
+                    password = System.getenv('MAVEN_PASSWORD') ?: ''
+                }
+            }
+        }
+
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
+
+                pom {
+                    name.set(property('POM_NAME').toString())
+                    description.set(property('POM_DESCRIPTION').toString())
+                    url.set(property('POM_URL').toString())
+                    inceptionYear.set(property('POM_INCEPTION_YEAR').toString())
+
+                    licenses {
+                        license {
+                            name.set(property('POM_LICENSE_NAME').toString())
+                            url.set(property('POM_LICENSE_URL').toString())
+                            distribution.set(property('POM_LICENSE_DIST').toString())
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            name.set(property('POM_DEVELOPER_NAME').toString())
+                            email.set(property('POM_DEVELOPER_EMAIL').toString())
+                            organizationUrl.set(property('POM_DEVELOPER_URL').toString())
+                        }
+                    }
+
+                    scm {
+                        url.set(property('POM_SCM_URL').toString())
+                        connection.set(property('POM_SCM_CONNECTION').toString())
+                        developerConnection.set(property('POM_SCM_DEV_CONNECTION').toString())
+                    }
+                }
+            }
+        }
+    }
+
+    // Signing configuration
+    signing {
+        required { gradle.taskGraph.hasTask('publish') }
+        sign publishing.publications.mavenJava
+    }
+}
+
+// Custom publish tasks
+task publishSnapshot {
+    doFirst {
+        if (!project.hasProperty("snapshotSuffix")) {
+            throw new GradleException("Please provide snapshotSuffix property. Usage: ./gradlew publishSnapshot -PsnapshotSuffix=<suffix>")
+        }
+    }
+    dependsOn 'publishMavenJavaPublicationToSnapshotsRepository'
+    doLast {
+        println "Published snapshot version for all subprojects"
+    }
+}
+
+task publishRelease {
+    dependsOn 'publishMavenJavaPublicationToReleasesRepository'
+    doLast {
+        println "Published release version for all subprojects"
+    }
+}
+
+// Gradle wrapper configuration
+wrapper {
+    gradleVersion = '8.5'
+}
+

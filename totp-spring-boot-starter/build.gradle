@@ -1,0 +1,14 @@
+description = 'A Spring Boot starter to autoconfigure the Java-TOTP library.'
+
+dependencies {
+    implementation project(':totp')
+    implementation 'org.springframework.boot:spring-boot-autoconfigure:4.0.6'
+    compileOnly 'org.springframework.boot:spring-boot-configuration-processor:4.0.6'
+}
+
+// Configure annotation processing for Spring Boot configuration processor
+compileJava {
+    options.annotationProcessorPath = configurations.compileClasspath
+    options.compilerArgs << '-proc:full'
+}
+

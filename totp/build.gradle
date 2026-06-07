@@ -1,0 +1,21 @@
+description = 'A library to help implement time-based one time passwords to enable MFA.'
+
+dependencies {
+    // Test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+
+    // Implementation dependencies
+    implementation 'commons-codec:commons-codec:1.17.1'
+    compileOnly 'commons-net:commons-net:3.11.1'
+    runtimeOnly 'commons-net:commons-net:3.11.1'
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'com.google.zxing:javase:3.5.3'
+}
+
+// Configure JUnit 5
+test {
+    useJUnitPlatform()
+}
